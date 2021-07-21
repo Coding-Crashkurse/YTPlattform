@@ -1,4 +1,4 @@
-# YTPlattform
+# Create your own data science platform
 
 ## Prerequisites
 
