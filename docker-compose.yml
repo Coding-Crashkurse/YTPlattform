@@ -13,7 +13,6 @@ services:
       - "./shinyproxy-logs/server:/log"
       - "./shinyproxy-logs/container:/container-logs"
       - "./shinyproxy:/opt/shinyproxy"
-      - './core:/usr/src/core'
   mysql:
     image: mysql:5.7
     networks:

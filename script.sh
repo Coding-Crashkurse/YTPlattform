@@ -46,7 +46,7 @@ cp /etc/letsencrypt/live/${domain}/fullchain.pem /home/datascience/nginx/fullcha
 cp /etc/letsencrypt/live/${domain}/privkey.pem /home/datascience/nginx/privkey.pem
 
 # Certs in .pfx wandeln für keystore.
-openssl pkcs12 -inkey /home/datascience/nginx/privkey.pem -in /home/datascience/nginx/fullchain.pem -export -passout pass:"changeit" -out /home/datascience/shinyproxy/certificate.pfx
+openssl pkcs12 -inkey /home/datascience/nginx/privkey.pem -in /home/datascience/nginx/fullchain.pem -export -password pass:"changeit" -out /home/datascience/shinyproxy/certificate.pfx
 
 # nginx stoppen damit ports nicht belegt sind
 systemctl stop nginx
