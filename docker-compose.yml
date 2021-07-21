@@ -1,0 +1,67 @@
+version: "3.7"
+
+services:
+  shinyproxy:
+    build: ./shinyproxy
+    networks:
+      - sp-example-net
+    container_name: shinyproxy
+    expose:
+      - 4000
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./shinyproxy-logs/server:/log"
+      - "./shinyproxy-logs/container:/container-logs"
+      - "./shinyproxy:/opt/shinyproxy"
+  mysql:
+    image: mysql:5.7
+    networks:
+      - sp-example-net
+    volumes:
+      - /home/mysqldata:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+  keycloak:
+    networks:
+      - sp-example-net
+    image: jboss/keycloak
+    ports:
+      - 8443:8443
+    environment:
+      PROXY_ADDRESS_FORWARDING: "true"
+      DB_VENDOR: MYSQL
+      DB_ADDR: mysql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+    volumes:
+      - /home/mysqldata:/opt/jboss/mysql_data
+      - ./nginx/fullchain.pem:/etc/x509/https/tls.crt
+      - ./nginx/privkey.pem:/etc/x509/https/tls.key
+    depends_on:
+      - mysql
+    links:
+      - mysql
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: always
+    networks:
+      - sp-example-net
+    depends_on:
+      - shinyproxy
+      - plattform
+    ports:
+      - "80:80"
+      - "443:443"
+
+networks:
+  sp-example-net:
+    name: sp-example-net

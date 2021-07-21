@@ -1,0 +1,43 @@
+proxy:
+  port: 4000
+  authentication: keycloak
+  template-path: ./templates/2col
+  admin-groups: admins
+  users:
+  - name: jack
+    password: password
+    groups: admins
+  - name: jeff
+    password: password
+  docker:
+      internal-networking: true
+  specs:
+  - id: 01_hello
+    display-name: Hello Application
+    description: Application which demonstrates the basics of a Shiny app
+    container-cmd: ["R", "-e", "shinyproxy::run_01_hello()"]
+    container-image: openanalytics/shinyproxy-demo
+    container-network: sp-example-net
+  - id: 06_tabsets
+    container-cmd: ["R", "-e", "shinyproxy::run_06_tabsets()"]
+    container-image: openanalytics/shinyproxy-demo
+    container-network: sp-example-net
+  - id: jupyter-notebook
+    display-name: Jupyter Notebook
+    description: Jupyter Notebook is a web-based interactive computational environment for creating Jupyter notebook documents.
+    container-cmd: ["start-notebook.sh", "--NotebookApp.token=''", "--NotebookApp.base_url=#{proxySpec.containerSpecs[0].env.get('SHINYPROXY_PUBLIC_PATH')}"]
+    container-image: openanalytics/shinyproxy-juypter-datascience
+    container-volumes: [ "/tmp/jupyter/#{proxy.userId}/work:/home/jovyan/work"]
+    container-network: sp-example-net
+    port: 8888
+    target-path: "#{proxySpec.containerSpecs[0].env.get('SHINYPROXY_PUBLIC_PATH')}"
+
+  keycloak:
+    realm: master
+    auth-server-url: https://academy.data-mastery.com/auth/
+    resource: account
+    credentials-secret: 59d993b5-ceb6-4cd1-8a3f-c8876fbd3fdd
+
+logging:
+  file:
+    shinyproxy.log
