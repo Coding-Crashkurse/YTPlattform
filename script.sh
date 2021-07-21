@@ -50,3 +50,9 @@ openssl pkcs12 -inkey /home/datascience/nginx/privkey.pem -in /home/datascience/
 
 # nginx stoppen damit ports nicht belegt sind
 systemctl stop nginx
+
+# Kill apache or nginx which might block port 80
+lsof -t -i tcp:80 -s tcp:listen | sudo xargs kill
+
+#Download shinyproxy
+wget https://nexus.openanalytics.eu/repository/snapshots/eu/openanalytics/shinyproxy/2.5.1-SNAPSHOT/shinyproxy-2.5.1-20210521.074523-12.jar -O /home/datascience/shinyproxy/shinyproxy.jar
